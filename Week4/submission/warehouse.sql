@@ -290,5 +290,11 @@ ORDER BY
     trip_count DESC;
 
 --------------------------------------------Question 7. Stretch: incremental load (watermark pattern)-------------------------------
---Modify etl.py so the fact load only extracts trips newer than the MAX(requested_at) already present in fact_trips.
---Where should that watermark be read from, and what happens the very first time the ETL runs against an empty warehouse?
+--Modify etl.py so the fact load only extracts trips newer than the MAX(requested_at) already present in fact_trips?
+--Answer: Created an new function as get_watermark() and pass watermark to extract trips function based on watermark is null or new.
+
+--Where should that watermark be read from?
+--Answer: from the warehouse fact table because warehouse knows what has already been loaded.
+
+--and what happens the very first time the ETL runs against an empty warehouse?
+--Answer: On the first run, fact_trips is empty, so MAX(requested_at) returns NULL. The ETL should treat a NULL watermark as an initial load and extract all trips from the source system.
