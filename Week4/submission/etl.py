@@ -98,7 +98,7 @@ def extract_vehicle(conn):
         category,
         is_active
     FROM
-        dim_vehicle;
+        vehicle;
     """
     return extract(conn, extract_vehicle_sql)
 
