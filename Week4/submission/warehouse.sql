@@ -1,3 +1,4 @@
+--------------Repushed to check the changes --------------------------------------
 CREATE TABLE dim_date (
     date_key        INTEGER      PRIMARY KEY,      -- e.g. 20240315
     full_date       DATE         NOT NULL UNIQUE,
