@@ -1,4 +1,4 @@
---------------Repushed to check the changes --------------------------------------
+
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import logging
@@ -597,4 +597,3 @@ def main():
 
 if __name__ == "__main__":
         main()
-
