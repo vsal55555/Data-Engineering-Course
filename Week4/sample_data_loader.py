@@ -37,21 +37,21 @@ DB_CONFIG = {
     "port":     os.getenv("DB_PORT", 5432),
     "dbname":   os.getenv("DB_NAME", "ride_prod"),
     "user":     os.getenv("DB_USER", "postgres"),
-    "password": os.getenv("DB_PASSWORD", "postgres"),
+    "password": os.getenv("DB_PASSWORD", "thiswillpass"),
 }
 
 SEED         = 42
 N_DRIVERS    = 25
 N_PASSENGERS = 45
-N_TRIPS      = 10_000
+N_TRIPS      = 10_000  
 N_VEHICLES   = 30
 
 random.seed(SEED)
 fake = Faker()
 Faker.seed(SEED)
 
-START_DATE = datetime(2023, 1, 1)
-END_DATE   = datetime(2026, 6, 30)
+START_DATE = datetime(2026, 7, 1)  #datetime(2023, 1, 1)
+END_DATE   = datetime(2026, 7, 31)  #datetime(2026, 6, 30)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
