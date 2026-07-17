@@ -9,7 +9,7 @@ from datetime import datetime
 from quality  import run_quality_checks
 from transform import transform
 from logger_config import setup_logger
-
+from quality import DataQualityError
 
 from load import (
     load_dim_driver,
@@ -114,6 +114,12 @@ def main():
         time0 = time.time()
         load_fact_trips(dst_conn, fact_rows)
         logger.info(f"Trip table load completed on {time.time() - time0:.2f}s")
+
+    except DataQualityError as e:
+        logger.error(f"QUALITY CHECK FAILED: {str(e)}")
+        logger.error(f"Pipeline Aborted")
+        return
+
     finally:
         src_conn.close()
         dst_conn.close()

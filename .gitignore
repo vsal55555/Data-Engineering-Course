@@ -2,5 +2,14 @@
 .venv/
 venv/
 env/
+
+# Environment
 .env
+
+# Python
 __pycache__
+*.pyc
+
+# Logs
+#logs/
+#*.log
