@@ -58,6 +58,7 @@ def main():
     
     logger = setup_logger()
     logger.info("Pipeline Started")
+    pipeline_start = time.time()
     args = parse_args()
     mode = 'FULL' if args.full_reload else 'INCREMENTAL'
     """
@@ -124,6 +125,7 @@ def main():
         src_conn.close()
         dst_conn.close()
 
+        logger.info(f"Pipeline complete in "f"{time.time() - pipeline_start:.2f}s")
 
 if __name__ == "__main__":
         main()
