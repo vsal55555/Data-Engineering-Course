@@ -1,0 +1,24 @@
+2026-07-17 06:03:28,654 | INFO | root | Pipeline Started
+2026-07-17 06:03:29,396 | INFO | extract | Extracted 25 from the table
+2026-07-17 06:03:29,450 | INFO | load | 0 inserted to dim_driver
+2026-07-17 06:03:29,470 | INFO | extract | Extracted 30 from the table
+2026-07-17 06:03:29,619 | INFO | load | 30 inserted to dim_vehicle
+2026-07-17 06:03:29,694 | INFO | extract | Extracted 45 from the table
+2026-07-17 06:03:29,770 | INFO | load | 0 inserted to dim_passenger
+2026-07-17 06:03:29,825 | INFO | extract | Extracted 25 from the table
+2026-07-17 06:03:29,923 | INFO | load | 0 inserted to dim_location
+2026-07-17 06:03:30,025 | INFO | extract | Extracted 7 from the table
+2026-07-17 06:03:30,173 | INFO | load | 0 inserted to dim_payment_method
+2026-07-17 06:03:30,303 | INFO | extract | Extracted 10 from the table
+2026-07-17 06:03:30,376 | INFO | load | 0 inserted to dim_promo_code
+2026-07-17 06:03:30,421 | INFO | root | Dimention table load completed on 1.18s
+2026-07-17 06:03:30,512 | INFO | extract | Loading lookup table into memmory
+2026-07-17 06:03:30,809 | INFO | root | Lookup table extraction completed on 0.30s
+2026-07-17 06:03:32,064 | INFO | extract | Extracted 5000 from the table
+2026-07-17 06:03:32,066 | INFO | root | Trip extraction  completed on 1.24s
+2026-07-17 06:03:32,517 | INFO | transform | Transformed 5000 rows, skipped 0
+2026-07-17 06:03:32,541 | INFO | root | Transformation completed on 0.47s
+2026-07-17 06:03:32,568 | INFO | quality | Quality gate passed: 5,000 rows, 5 checks
+2026-07-17 06:03:32,572 | INFO | root | Quality Check completed on 0.03s
+2026-07-17 06:03:37,971 | INFO | load | 0 inserted to fact_trips
+2026-07-17 06:03:38,003 | INFO | root | Trip table load completed on 5.42s

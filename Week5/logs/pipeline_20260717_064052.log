@@ -1,0 +1,21 @@
+2026-07-17 06:40:52,011 | INFO | root | Pipeline Started
+2026-07-17 06:40:52,590 | INFO | extract | Extracted 25 from the table
+2026-07-17 06:40:52,646 | INFO | load | 25 inserted to dim_driver
+2026-07-17 06:40:52,670 | INFO | extract | Extracted 30 from the table
+2026-07-17 06:40:52,718 | INFO | load | 30 inserted to dim_vehicle
+2026-07-17 06:40:52,747 | INFO | extract | Extracted 45 from the table
+2026-07-17 06:40:52,824 | INFO | load | 45 inserted to dim_passenger
+2026-07-17 06:40:52,862 | INFO | extract | Extracted 25 from the table
+2026-07-17 06:40:52,920 | INFO | load | 25 inserted to dim_location
+2026-07-17 06:40:53,016 | INFO | extract | Extracted 7 from the table
+2026-07-17 06:40:53,038 | INFO | load | 7 inserted to dim_payment_method
+2026-07-17 06:40:53,069 | INFO | extract | Extracted 10 from the table
+2026-07-17 06:40:53,117 | INFO | load | 10 inserted to dim_promo_code
+2026-07-17 06:40:53,128 | INFO | root | Dimention table load completed on 0.56s
+2026-07-17 06:40:53,140 | INFO | extract | Loading lookup table into memmory
+2026-07-17 06:40:53,217 | INFO | root | Lookup table extraction completed on 0.08s
+2026-07-17 06:40:53,273 | INFO | extract | Watermark: 2026-07-30 23:57:54
+2026-07-17 06:40:53,331 | INFO | extract | Extracted 5 from the table
+2026-07-17 06:40:53,360 | INFO | root | Trip extraction  completed on 0.14s
+2026-07-17 06:40:53,379 | INFO | transform | Transformed 5 rows, skipped 0
+2026-07-17 06:40:53,393 | INFO | root | Transformation completed on 0.02s

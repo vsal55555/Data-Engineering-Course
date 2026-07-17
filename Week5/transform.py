@@ -2,22 +2,34 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 def transform(oltp_row, lookups):
     fact_rows = []
     skipped = 0
     for row in oltp_row:
         trip_id = row["trip_id"]
 
-        date_key = int(row["requested_at"].strftime("%Y%m%d"))
+        date_key = int(row["requested_at"].strftime("%Y%m%d")) # Output: '20260709' 
         if date_key not in lookups["date"]:
             logger.warning(f"trip {trip_id}: date_key {date_key} outside of dim_date range — skipped")
             skipped += 1
             continue
 
-        driver_key = lookups["driver"].get(row["driver_id"])
-        if driver_key is None:
+        driver_key = lookups["driver"].get(row["driver_id"]) 
+        if driver_key is None: 
             logger.warning(f"trip {trip_id}: driver_id {row['driver_id']} not in dim_driver — skipped")
+            skipped += 1
+            continue
+
+        vehicle_key = lookups["vehicle"].get(row["vehicle_id"]) 
+        if vehicle_key is None:
+            logger.warning(f"trip {trip_id}: vehicle_id {row['vehicle_id']} not in dim_vehicle — skipped")
+            skipped += 1
+            continue
+        
+        requested_at = row["requested_at"]
+        time_key = (requested_at.hour * 100) + (requested_at.minute // 15) * 15
+        if time_key not in lookups["time"]:
+            logger.warning(f"trip {trip_id}: time_key {time_key} outside of dim_time range — skipped")
             skipped += 1
             continue
 
@@ -73,7 +85,9 @@ def transform(oltp_row, lookups):
         fact_rows.append({
             "source_trip_id":       trip_id,
             "date_key":             date_key,
+            "time_key":             time_key,
             "driver_key":           driver_key,
+            "vehicle_key":          vehicle_key,
             "passenger_key":        passenger_key,
             "pickup_location_key":  pickup_location_key,
             "dropoff_location_key": dropoff_location_key,
@@ -83,8 +97,8 @@ def transform(oltp_row, lookups):
             "tip_amount":           tip_amount,
             "discount_amount":      discount_amount,
             "fare_amount":          fare_amount,
-            "distance_km":          row["distance_km"],
             "status":               row["status"],
+            "distance_km":          row["distance_km"],
             "duration_minutes":     duration_minutes,
             "driver_rating":        row["driver_rating"],
             "passenger_rating":     row["passenger_rating"],

@@ -4,21 +4,19 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-
-def extract(conn, sql,params=None):
+def extract(conn,sql, params=None):
     try:
-        with conn.cursor(cursor_factory=RealDictCursor) as curr:
+        with conn.cursor(cursor_factory =RealDictCursor ) as curr:
             curr.execute(sql,params)
             rows = curr.fetchall()
             logger.info(f"Extracted {len(rows)} from the table")
         return rows
     except Exception as e:
         logger.error(str(e))
-        raise
-
-
+        raise 
+    
 def extract_driver(conn):
-    extract_driver_sql = """
+     extract_driver_sql = """
     SELECT
         driver_id ,
         name,
@@ -33,7 +31,27 @@ def extract_driver(conn):
     FROM
         drivers d ;
     """
-    return extract(conn, extract_driver_sql)
+     return extract(conn,extract_driver_sql)
+
+    
+
+
+def extract_vehicle(conn):
+    extract_vehicle_sql = """
+     SELECT
+        vehicle_id,
+        plate_number,
+        make,
+        model,
+        year,
+        color,
+        category,
+        is_active
+    FROM
+        vehicles;
+    """
+    return extract(conn, extract_vehicle_sql)
+
 
 
 def extract_passenger(conn):
@@ -48,6 +66,7 @@ def extract_passenger(conn):
         passengers p;
     """
     return extract(conn, extract_passenger_sql)
+
 
 
 def extract_location(conn):
@@ -86,6 +105,9 @@ def extract_location(conn):
     return extract(conn, extract_location_sql)
 
 
+
+
+
 def extract_payment_method(conn):
     extract_payment_method_sql = """
     SELECT
@@ -97,6 +119,7 @@ def extract_payment_method(conn):
         payment_methods pm;
     """
     return extract(conn, extract_payment_method_sql)
+
 
 
 def extract_promo_code(conn):
@@ -113,39 +136,12 @@ def extract_promo_code(conn):
     return extract(conn, extract_promo_code_sql)
 
 
-def extract_trips_incremental(conn,watermark):
-    extract_trip_sql = """
-      SELECT
-        t.trip_id,
-        t.driver_id,
-        t.passenger_id,
-        t.pickup_location_id,
-        t.dropoff_location_id,
-        t.payment_method_id,
-        t.promo_code_id,
-        t.base_fare,
-        t.tip_amount,
-        t.discount_amount,
-        t.surge_multiplier,
-        t.distance_km,
-        t.status,
-        t.requested_at,
-        t.completed_at,
-        t.driver_rating,
-        t.passenger_rating,
-        tc.cancelled_by          -- from trip_cancellations (NULL for non-cancelled)
-    FROM  trips t
-    LEFT JOIN trip_cancellations tc ON t.trip_id = tc.trip_id
-     WHERE t.requested_at > %(watermark)s
-    ORDER BY t.requested_at
-        """
-    return extract(conn, extract_trip_sql,watermark)
-
 def extract_trips_full(conn):
-    extract_trip_sql = """
+    extract_alltrip_sql = """
       SELECT
         t.trip_id,
         t.driver_id,
+        t.vehicle_id,
         t.passenger_id,
         t.pickup_location_id,
         t.dropoff_location_id,
@@ -166,32 +162,69 @@ def extract_trips_full(conn):
     LEFT JOIN trip_cancellations tc ON t.trip_id = tc.trip_id
     ORDER BY t.requested_at
         """
-    return extract(conn, extract_trip_sql)
+    return extract(conn,extract_alltrip_sql)
+
+def extract_trips_incremental(conn, watermark):
+    extract_newtrip_sql = """
+      SELECT
+        t.trip_id,
+        t.driver_id,
+        t.vehicle_id,
+        t.passenger_id,
+        t.pickup_location_id,
+        t.dropoff_location_id,
+        t.payment_method_id,
+        t.promo_code_id,
+        t.base_fare,
+        t.tip_amount,
+        t.discount_amount,
+        t.surge_multiplier,
+        t.distance_km,
+        t.status,
+        t.requested_at,
+        t.completed_at,
+        t.driver_rating,
+        t.passenger_rating,
+        tc.cancelled_by          -- from trip_cancellations (NULL for non-cancelled)
+    FROM  trips t
+    LEFT JOIN trip_cancellations tc ON t.trip_id = tc.trip_id
+    where t.requested_at > %(watermark)s
+    ORDER BY t.requested_at
+        """
+    return extract(conn,extract_newtrip_sql,watermark)
 
 def extract_lookup_dim(conn):
     logger.info("Loading lookup table into memmory")
     lookup = {}
     with conn.cursor() as curr:
         curr.execute("SELECT driver_id, driver_key FROM dim_driver")
-        lookup["driver"] = {r[0]: r[1] for r in curr.fetchall()}
+        lookup["driver"] = {r[0]:r[1] for r in curr.fetchall()}
+
+        curr.execute("SELECT vehicle_id, vehicle_key FROM dim_vehicle")
+        lookup["vehicle"] = {r[0]:r[1] for r in curr.fetchall()}
+        
 
         curr.execute("SELECT passenger_id, passenger_key FROM dim_passenger")
-        lookup["passenger"] = {r[0]: r[1] for r in curr.fetchall()}
+        lookup["passenger"] = {r[0]:r[1] for r in curr.fetchall()}
 
         curr.execute("SELECT location_id, location_key FROM dim_location")
-        lookup["location"] = {r[0]: r[1] for r in curr.fetchall()}
+        lookup["location"] = {r[0]:r[1] for r in curr.fetchall()}
 
         curr.execute("SELECT payment_method_id, payment_method_key FROM dim_payment_method")
-        lookup["payment_method"] = {r[0]: r[1] for r in curr.fetchall()}
+        lookup["payment_method"] = {r[0]:r[1] for r in curr.fetchall()}
 
         curr.execute("SELECT promo_code_id, promo_code_key FROM dim_promo_code")
-        lookup["promo_code"] = {r[0]: r[1] for r in curr.fetchall()}
+        lookup["promo_code"] = {r[0]:r[1] for r in curr.fetchall()}
 
         curr.execute("SELECT date_key FROM dim_date")
         lookup["date"] = {r[0]: True for r in curr.fetchall()}
+
+        curr.execute("SELECT time_key FROM dim_time")
+        lookup["time"] = {r[0]: True for r in curr.fetchall()}
     return lookup
 
 
+#SELECT COALESCE (max(ft.requested_at), 1999-01-01) FROM fact_trips ft;
 def get_watermark(conn) -> datetime:
     """
     Return the most recent requested_at already loaded in the warehouse.
