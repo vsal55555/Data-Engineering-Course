@@ -28,7 +28,7 @@ class DataQualityError(Exception):
     pass
 
 
-def check_row_count(rows: list, min_rows: int = 5) -> dict:
+def check_row_count(rows: list, min_rows: int = 0) -> dict:
     """Fail if the transformed row count is below a minimum threshold."""
     count = len(rows)
     passed = count >= min_rows

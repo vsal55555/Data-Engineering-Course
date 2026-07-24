@@ -52,23 +52,31 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+logger.info(f"SRC_DB_HOST={SOURCE_DB_CONFIG['host']}")
+logger.info(f"SRC_DB_NAME={SOURCE_DB_CONFIG['dbname']}")
+
+logger.info(f"SRC_DB_USER={SOURCE_DB_CONFIG['user']}")
+logger.info(f"Password Length={len(SOURCE_DB_CONFIG['password'])}")
 
 
 def main():
-    
-    logger = setup_logger()
-    logger.info("Pipeline Started")
-    pipeline_start = time.time()
-    args = parse_args()
-    mode = 'FULL' if args.full_reload else 'INCREMENTAL'
-    """
-    Extract all dimension data from the source DB and load them into the target DB.
-    """
 
-    src_conn = psycopg2.connect(**SOURCE_DB_CONFIG)
-    dst_conn = psycopg2.connect(**DEST_DB_CONFIG)
-
+    src_conn = None
+    dst_conn = None
     try:
+        logger = setup_logger()
+        logger.info("Pipeline Started")
+        pipeline_start = time.time()
+        args = parse_args()
+        mode = 'FULL' if args.full_reload else 'INCREMENTAL'
+        """
+        Extract all dimension data from the source DB and load them into the target DB.
+        """
+
+        src_conn = psycopg2.connect(**SOURCE_DB_CONFIG)
+        dst_conn = psycopg2.connect(**DEST_DB_CONFIG)
+
+    
         time0 = time.time()
         driver_data = extract_driver(src_conn)
         load_dim_driver(dst_conn, driver_data)
@@ -116,14 +124,25 @@ def main():
         load_fact_trips(dst_conn, fact_rows)
         logger.info(f"Trip table load completed on {time.time() - time0:.2f}s")
 
+    except psycopg2.OperationalError as e:
+       raise ConnectionError("Source database authentication failed. "
+                             "Please verify SRC_DB_USER and SRC_DB_PASSWORD.") from e
+
+    except Exception as e:
+        logger.exception(f"Pipeline Failed: {e}")
+        return
+
     except DataQualityError as e:
         logger.error(f"QUALITY CHECK FAILED: {str(e)}")
         logger.error(f"Pipeline Aborted")
         return
 
     finally:
-        src_conn.close()
-        dst_conn.close()
+        if src_conn:
+            src_conn.close()
+
+        if dst_conn:
+            dst_conn.close()
 
         logger.info(f"Pipeline complete in "f"{time.time() - pipeline_start:.2f}s")
 

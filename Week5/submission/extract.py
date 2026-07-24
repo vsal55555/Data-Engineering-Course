@@ -223,8 +223,6 @@ def extract_lookup_dim(conn):
         lookup["time"] = {r[0]: True for r in curr.fetchall()}
     return lookup
 
-
-#SELECT COALESCE (max(ft.requested_at), 1999-01-01) FROM fact_trips ft;
 def get_watermark(conn) -> datetime:
     """
     Return the most recent requested_at already loaded in the warehouse.
